@@ -1,6 +1,14 @@
 import SpeechApi from './SpeechApi';
 
-export default class SpeechTranscription {
+window.addEventListener('DOMContentLoaded', () => {
+	if (SpeechApi) {
+		const speechRecognition = new SpeechTranscription();
+		speechRecognition.render();
+		return;
+	}
+	document.getElementById('main').innerHTML = 'API não esta disponível';
+});
+class SpeechTranscription {
 	constructor() {
 		this.btnTranscription = document.getElementById('button-record');
 		this.transcriptionElement = document.getElementById('transcription');
@@ -10,18 +18,12 @@ export default class SpeechTranscription {
 	}
 
 	render() {
-		if (!SpeechApi) {
-			document.getElementById('root').innerHTML = 'API não está disponivel';
-			return;
-		}
 		this.btnTranscription.addEventListener('click', () => {
-			this.isRecording
-				? this.audioRecordApi.stop()
-				: this.audioRecordApi.start();
+			this.isRecording ? this.audioRecordApi.stop() : this.init();
 		});
-		this.init();
 	}
 	init() {
+		this.audioRecordApi.start();
 		this.audioRecordApi.continuos = true;
 		this.audioRecordApi.interimResults = true;
 		this.audioRecordApi.lang = 'pt-BR';
@@ -42,22 +44,15 @@ export default class SpeechTranscription {
 		this.btnTranscription.innerHTML = 'Começar a Gravar';
 	}
 	onresult(event) {
-		let interim_transcript = '';
-
-		for (let i = event.resultIndex; i < event.results.length; i++) {
-			if (event.results[i].isFinal) {
-				this.transcription += event.results[i][0].transcript;
+		let transcript = '';
+		for (let index = event.resultIndex; index < event.results.length; index++) {
+			if (event.results[index].isFinal) {
+				this.transcription += event.results[index][0].transcript;
 			} else {
-				interim_transcript += event.results[i][0].transcript;
+				transcript += event.results[index][0].transcript;
 			}
 
-			this.transcriptionElement.innerText =
-				this.transcription || interim_transcript;
+			this.transcriptionElement.innerText = this.transcription || transcript;
 		}
 	}
 }
-
-window.addEventListener('DOMContentLoaded', () => {
-	const speechRecognition = new SpeechTranscription();
-	speechRecognition.render();
-});
