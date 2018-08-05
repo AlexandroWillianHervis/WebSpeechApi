@@ -1,5 +1,4 @@
-import sayHello from './hello';
-
-document.getElementById('root').innerHTML = sayHello();
-
-
+import './index.scss';
+import './material.min.css';
+// import './material.min.js';
+import 'main.js';
